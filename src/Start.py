@@ -4,6 +4,31 @@ import Utils as u
 textboxes = []
 
 
+def data_validation():
+    return True
+    d = float(textboxes[0].text)
+    if d < -89.999 or d > -88.0001: 
+        print('[0] Out of range.')
+        return False
+
+    d = float(textboxes[1].text)
+    if d < -179.98109 or d > 179.98109:
+        print('[1] Out of range.')
+        return False
+
+    d = float(textboxes[2].text)
+    if d < -89.999 or d > -88.0001: 
+        print('[2] Out of range.')
+        return False
+
+    d = float(textboxes[3].text)
+    if d < -179.98109 or d > 179.98109:
+        print('[3] Out of range.')
+        return False
+
+    return True
+
+
 def init(pg):
     global textboxes
 
@@ -28,10 +53,15 @@ def update(pygame, display, deltatime, cs):
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    f = open('TEMPDATA', 'w')
-                    for t in textboxes:
-                        f.write(f'{t.text}\n')
-                    return 1
+                    if data_validation():
+                        f = open('TEMPDATA', 'w')
+                        for t in textboxes:
+                            f.write(f'{t.text}\n')
+                        f.close()
+                        return 1
+                    else:
+                        print('Error with validation (user error)')
+
 
     # render #
     display.fill((19, 27, 35))

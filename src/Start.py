@@ -5,7 +5,6 @@ textboxes = []
 
 
 def data_validation():
-    return True
     d = float(textboxes[0].text)
     if d < -89.999 or d > -88.0001: 
         print('[0] Out of range.')
@@ -29,14 +28,14 @@ def data_validation():
     return True
 
 
-def init(pg):
+def init(pg, display):
     global textboxes
 
-    textboxes.append(u.Textbox(pg, 35, 130, 200, 50, '0', (0, 0, 0), 40))
-    textboxes.append(u.Textbox(pg, 275, 130, 200, 50, '0', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 35, 130, 200, 50, '-89.40', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 275, 130, 200, 50, '4.24', (0, 0, 0), 40))
 
-    textboxes.append(u.Textbox(pg, 35, 230, 200, 50, '0', (0, 0, 0), 40))
-    textboxes.append(u.Textbox(pg, 275, 230, 200, 50, '0', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 35, 230, 200, 50, '-88.51', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 275, 230, 200, 50, '-23.8', (0, 0, 0), 40))
 
     textboxes.append(u.Textbox(pg, 35, 330, 200, 50, '500', (0, 0, 0), 40))
     textboxes.append(u.Textbox(pg, 275, 330, 200, 50, '500', (0, 0, 0), 40))

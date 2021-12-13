@@ -28,7 +28,7 @@ CURRENTSTATE = 0
 
 def main():
     global CURRENTSTATE
-    state[CURRENTSTATE].init(pygame)
+    state[CURRENTSTATE].init(pygame, display)
     while running:
         CS = CURRENTSTATE
         deltatime = clock.tick(FPS)
@@ -36,7 +36,7 @@ def main():
         pygame.display.update()
         CURRENTSTATE = state[CURRENTSTATE].update(pygame, display, deltatime, CS)
         if CS != CURRENTSTATE:
-            state[CURRENTSTATE].init(pygame)
+            state[CURRENTSTATE].init(pygame, display)
 
 
 if __name__ == '__main__':

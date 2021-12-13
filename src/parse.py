@@ -7,7 +7,7 @@ minheight = 9999
 minslope = 9999
 maxslope = -9999
 
-for i, line in enumerate(open('prec.csv', 'r')):
+for i, line in enumerate(open('regional.csv', 'r')):
     s = line.split(',')
     print(f'\rCurrently on line: {i}', end='')
     minlat = min(float(s[0]), minlat)

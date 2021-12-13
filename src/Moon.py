@@ -38,10 +38,14 @@ def get_y(lon, lonpy, minlon):
 def get_color_efficient(DATA, latpx, lonpy, minlon):
     # loop through data #
     # get x, y from lat, lon #
-    # if x, y is a valid coord add to pixels array #
-    # once there are SX*SY pixels, break #
-    # return pixels #
-    pixels = [ [None] * SCREEN_X ] * SCREEN_Y
+    # if x, y is a valid coord add to parr array #
+    # once there are SX*SY parr, break #
+    # return parr #
+
+    parr = [[]] * SCREEN_X
+    for y in range(SCREEN_X):
+        parr[y] = [(0, 255, 0)] * SCREEN_Y
+
     totpix = 0
     goal = SCREEN_X * SCREEN_Y
     for line in DATA:
@@ -49,26 +53,25 @@ def get_color_efficient(DATA, latpx, lonpy, minlon):
         x = get_x(float(sp[0]), latpx)
         y = get_y(float(sp[1]), lonpy, minlon)
         if 0 <= x < SCREEN_X and 0 <= y < SCREEN_Y:
-            if pixels[x][y] == None:
+            if parr[x][y] == (0, 255, 0):
                 slop = int(sp[3])
                 g = int(slop * 3.923077)
-                pixels[x][y] = (g, g, g)
+                parr[x][y] = (g, g, g)
                 totpix += 1
-                print(f'New pixel at [{x}][{y}] :: {totpix}/{goal}')
+                print(f'New pixel at [{x}][{y}] :: {totpix}/{goal}', end='\r')
                 if totpix >= goal:
+                    print('Reached max parr')
                     break
 
-    print(pixels[20][5])
-    pixels[0][5] = (255, 0, 0)
-    print(pixels[20][5])
+    # why does this shit extend the whole column #
 
-    for i in range(len(pixels)):
-        for k in range(len(pixels[i])):
-            if pixels[i][k] == None:
+    for i in range(len(parr)):
+        for k in range(len(parr[i])):
+            if parr[i][k] == None:
                 print('green!')
-                pixels[i][k] = (0, 255, 0)
+                parr[i][k] = (0, 255, 0)
 
-    return pixels
+    return parr
 
 
 def init(pg, display):
@@ -123,11 +126,7 @@ def update(pygame, display, deltatime, cs):
 
     # render #
     display.fill((19, 27, 35))
-    #display.blit(MOON_IMG, (0, 0))
-    # RENDER EACH PIXEL #
-    for y, row in enumerate(PIXELS):
-        for x, p in enumerate(row):
-           display.set_at((x, y), p) 
+    display.blit(MOON_IMG, (0, 0))
 
     # state #
     return cs

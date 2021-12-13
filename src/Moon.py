@@ -29,22 +29,48 @@ MOON_IMG = None
 PIXELS = None 
 
 
+def get_avg_color(parr, i, k):
+    if i == 0 or i >= SCREEN_X-1:
+        return (0, 0, 0)
+    elif k == 0 or k >= SCREEN_Y-1:
+        return (0, 0, 0)
+    s = 0
+    s += parr[i-1][k-1][0] 
+    s += parr[i-1][k][0] 
+    s += parr[i-1][k+1][0] 
+    s += parr[i][k-1][0] 
+    s += parr[i][k+1][0] 
+    s += parr[i+1][k-1][0] 
+    s += parr[i+1][k][0] 
+    s += parr[i+1][k+1][0] 
+    g = s/8
+    return (int(g), int(g), int(g)) 
+
+
 def get_x(lat, latpx):
     return round( (lat-(-89.999))/latpx ) 
 
 def get_y(lon, lonpy, minlon):
     return round( (lon-minlon)/lonpy )
 
-def get_color_efficient(DATA, latpx, lonpy, minlon):
-    # loop through data #
-    # get x, y from lat, lon #
-    # if x, y is a valid coord add to parr array #
-    # once there are SX*SY parr, break #
-    # return parr #
 
+def set_bar(per):
+    per = int(per/10)
+    bar = ''
+    for i in range(per):
+        bar += '#'
+    for i in range(10-per):
+        bar += ' '
+    return bar 
+
+
+def get_color_efficient(DATA, latpx, lonpy, minlon):
     parr = [[]] * SCREEN_X
     for y in range(SCREEN_X):
         parr[y] = [(0, 255, 0)] * SCREEN_Y
+
+    bar = ''
+    print('0% [          ]', end='\r')
 
     totpix = 0
     goal = SCREEN_X * SCREEN_Y
@@ -58,18 +84,18 @@ def get_color_efficient(DATA, latpx, lonpy, minlon):
                 g = int(slop * 3.923077)
                 parr[x][y] = (g, g, g)
                 totpix += 1
-                print(f'New pixel at [{x}][{y}] :: {totpix}/{goal}', end='\r')
+                per = int((totpix/goal) * 100) 
+                bar = set_bar(per)
+                print(f'{per}% [{bar}]', end='\r')
                 if totpix >= goal:
-                    print('Reached max parr')
                     break
-
-    # why does this shit extend the whole column #
-
+    print('')
+            
     for i in range(len(parr)):
         for k in range(len(parr[i])):
-            if parr[i][k] == None:
-                print('green!')
-                parr[i][k] = (0, 255, 0)
+            if parr[i][k] == (0, 255, 0):
+                parr[i][k] = get_avg_color(parr, i, k) 
+                pass
 
     return parr
 
@@ -100,7 +126,7 @@ def init(pg, display):
     latpx = 1.999066 / SCREEN_X
     lonpy = (abs(MAX_LON - MIN_LON)) / SCREEN_Y 
 
-    print('This will take a long time!')
+    print('Rendering image...')
     data = open(f'{sys.path[0]}/../data/lunardata.csv').readlines()
     pixelss = get_color_efficient(data, latpx, lonpy, MIN_LON)
     global PIXELS
@@ -123,6 +149,8 @@ def update(pygame, display, deltatime, cs):
                 print('Exiting...')
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                print('h4932874')
 
     # render #
     display.fill((19, 27, 35))

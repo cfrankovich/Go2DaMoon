@@ -3,9 +3,11 @@ import sys
 import time
 import pygame
 from pygame.locals import *
+import Utils as u
 
 # States #
 import Start as start
+import Moon as moon
 
 pygame.init()
 pygame.display.set_caption('Go2DaMoon')
@@ -20,7 +22,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT), 0)
 display = pygame.Surface((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 GAMEPATH = sys.path[0]
-state = [start]
+state = [start, moon]
 CURRENTSTATE = 0
 
 
@@ -38,5 +40,6 @@ def main():
 
 
 if __name__ == '__main__':
+    u.initassets(pygame)
     main()
 

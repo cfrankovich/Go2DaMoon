@@ -2,3 +2,7 @@
 *.pdf
 todo
 data/
+src/TEMPDATA
+src/__pycache__/*
+*.pyc
+*.swp

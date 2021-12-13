@@ -1,5 +1,15 @@
 import sys
 
+ASSETS = []
+
+def loadasset(name, pg):
+    asset = pg.image.load(f'{sys.path[0]}/../assets/{name}.png').convert()
+    return asset
+
+def initassets(pg):
+    global ASSETS
+    ASSETS.append(loadasset('start', pg)) # 0
+
 class Textbox:
     def __init__(self, pg, x, y, w, h, text, color, fontsize):
         self.text = text
@@ -17,9 +27,7 @@ class Textbox:
 
     def turnon(self):
         self.active = True
-        self.color = (0, 255, 0)
 
     def turnoff(self):
         self.active = False
-        self.color = (255, 0, 0)
 

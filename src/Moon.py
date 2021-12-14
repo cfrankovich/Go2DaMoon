@@ -17,16 +17,31 @@ MAX_LAT = -88.000001 # right
 MIN_LON = 0.0 # top
 MAX_LON = 0.0 # bottom
 
-MAX_HEIGHT = 1958.0 # white
-MIN_HEIGHT = -4249.5 # black
+latpx = 0.0
+lonpy = 0.0
 
-MAX_SLOPE = 65.0 # idk
-MIN_SLOPE = 0.0 # idk
+MAX_HEIGHT = 1958.0 # idk 
+MIN_HEIGHT = -4249.5 # idk 
+MAX_SLOPE = 65.0 # whtie 
+MIN_SLOPE = 0.0 # black 
 
 MOON_IMAGE_NAME = None
 MOON_IMG = None
-
 PIXELS = None 
+
+POINTS = []
+
+
+def plot_point_ll(pygame, display, lat, lon, r, c):
+    x = get_x(lat, latpx) 
+    y = get_y(lon, lonpy, MIN_LON) 
+    pygame.draw.circle(display, c, (x, y), r)
+
+
+def plot_point_img(display, lat, lon, i):
+    x = get_x(lat, latpx) 
+    y = get_y(lon, lonpy, MIN_LON) 
+    display.blit(u.ASSETS[i], (x-16, y-16))
 
 
 def get_avg_color(parr, i, k):
@@ -65,11 +80,13 @@ def set_bar(per):
 
 
 def get_color_efficient(DATA, latpx, lonpy, minlon):
+    print('[o] Initializing array')
     parr = [[]] * SCREEN_X
     for y in range(SCREEN_X):
         parr[y] = [(0, 255, 0)] * SCREEN_Y
 
     bar = ''
+    print('[o] Reading and processing lunar data')
     print('0% [          ]', end='\r')
 
     totpix = 0
@@ -89,8 +106,10 @@ def get_color_efficient(DATA, latpx, lonpy, minlon):
                 print(f'{per}% [{bar}]', end='\r')
                 if totpix >= goal:
                     break
-    print('')
+
+    print(f'100% [##########]')
             
+    print('[o] Filling in missing values')
     for i in range(len(parr)):
         for k in range(len(parr[i])):
             if parr[i][k] == (0, 255, 0):
@@ -100,7 +119,7 @@ def get_color_efficient(DATA, latpx, lonpy, minlon):
     return parr
 
 
-def init(pg, display):
+def init(pg, display, argv):
     global LAND_LAT
     global LAND_LON
     global DEST_LAT
@@ -109,35 +128,74 @@ def init(pg, display):
     global SCREEN_Y
     global MOON_IMAGE_NAME
     global MOON_IMG
-    
+
+    print('')
+    pi = None
+    verbose = False
+    for i in range(len(argv)):
+        if argv[i] == '-i':
+            try:
+                pi = argv[i+1]
+            except:
+                print('[-] Error! No argument given')
+        elif argv[i] == '-v' or argv[i] == '--verbose':
+            verbose = True
+   
+    if verbose:
+        print('[o] Loading data from temp file')
     lines = open('TEMPDATA').readlines()
     LAND_LAT = float(lines[0])
     LAND_LON = float(lines[1])
     DEST_LAT = float(lines[2])
     DEST_LON = float(lines[3])
-    SCREEN_X = int(lines[4])
-    SCREEN_Y = int(lines[5])
+    SCREEN_X = int(lines[4]) 
+    SCREEN_Y = int(lines[5]) 
+    if verbose:
+        print('[+] Data loaded! Deleting temp file...')
     os.remove('TEMPDATA')
+    if verbose:
+        print('[+] Temp file removed')
 
     # For the screen #
-    MIN_LON = min(LAND_LON, DEST_LON) - 1
+    if verbose:
+        print('[o] Calculating crucial data...')
+    global MIN_LON
+    global MAX_LON
+    MIN_LON = min(LAND_LON, DEST_LON) - 1 
     MAX_LON = max(LAND_LON, DEST_LON) + 1 
 
+    global latpx
+    global lonpy
     latpx = 1.999066 / SCREEN_X
     lonpy = (abs(MAX_LON - MIN_LON)) / SCREEN_Y 
 
-    print('Rendering image...')
+    if verbose:
+        print('[o] Checking for preset image...')
+    if pi:
+        print('[o] Preset image detected! Skipping rendering process...')
+        try:
+            MOON_IMG = pg.image.load(pi)
+            print('[o] Preset image loaded!')
+            return
+        except:
+            print('[-] Error loading image!')
+    
+    print('[o] Rendering image...')
     data = open(f'{sys.path[0]}/../data/lunardata.csv').readlines()
     pixelss = get_color_efficient(data, latpx, lonpy, MIN_LON)
     global PIXELS
     PIXELS = pixelss
-    print('Done!')
+    print('[+] Done!')
 
+    if verbose:
+        print('[o] Saving image to file')
     arr = np.array(pixelss, dtype=np.uint8)
     img = Image.fromarray(arr, "RGB")
-    MOON_IMAGE_NAME = f'MoonImage_{datetime.now().timestamp()}.png'
+    MOON_IMAGE_NAME = f'MoonImage_{LAND_LAT}_{LAND_LON}_{DEST_LAT}_{DEST_LON}.png'
     img.save(MOON_IMAGE_NAME)
     MOON_IMG = pg.image.load(f'{sys.path[0]}/{MOON_IMAGE_NAME}').convert()
+    if verbose:
+        print('[+] Image successfully saved!')
 
 
 def update(pygame, display, deltatime, cs):
@@ -149,12 +207,14 @@ def update(pygame, display, deltatime, cs):
                 print('Exiting...')
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                print('h4932874')
 
     # render #
-    display.fill((19, 27, 35))
+    display.fill((0, 255, 0))
     display.blit(MOON_IMG, (0, 0))
+
+    # Now plot the two points #
+    plot_point_img(display, LAND_LAT, LAND_LON, 2)
+    plot_point_img(display, DEST_LAT, DEST_LON, 1)
 
     # state #
     return cs

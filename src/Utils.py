@@ -4,11 +4,14 @@ ASSETS = []
 
 def loadasset(name, pg):
     asset = pg.image.load(f'{sys.path[0]}/../assets/{name}.png').convert()
+    asset.set_colorkey((255, 0, 255))
     return asset
 
 def initassets(pg):
     global ASSETS
     ASSETS.append(loadasset('start', pg)) # 0
+    ASSETS.append(loadasset('flag', pg))
+    ASSETS.append(loadasset('star', pg)) # 2
 
 class Textbox:
     def __init__(self, pg, x, y, w, h, text, color, fontsize):

@@ -2,6 +2,7 @@ import sys
 import Utils as u
 
 textboxes = []
+verbose = False
 
 
 def data_validation():
@@ -28,17 +29,27 @@ def data_validation():
     return True
 
 
-def init(pg, display):
+def init(pg, display, argv):
     global textboxes
 
-    textboxes.append(u.Textbox(pg, 35, 130, 200, 50, '-89.40', (0, 0, 0), 40))
-    textboxes.append(u.Textbox(pg, 275, 130, 200, 50, '4.24', (0, 0, 0), 40))
+    for arg in argv:
+        if arg == '-v' or arg == '--verbose':
+            global verbose
+            verbose = True
 
-    textboxes.append(u.Textbox(pg, 35, 230, 200, 50, '-88.51', (0, 0, 0), 40))
-    textboxes.append(u.Textbox(pg, 275, 230, 200, 50, '-23.8', (0, 0, 0), 40))
+    if verbose:
+        print('')
+        print('[o] Initializing start screen...')
+    textboxes.append(u.Textbox(pg, 35, 130, 200, 50, '-89', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 275, 130, 200, 50, '0', (0, 0, 0), 40))
+
+    textboxes.append(u.Textbox(pg, 35, 230, 200, 50, '-88.5', (0, 0, 0), 40))
+    textboxes.append(u.Textbox(pg, 275, 230, 200, 50, '40', (0, 0, 0), 40))
 
     textboxes.append(u.Textbox(pg, 35, 330, 200, 50, '500', (0, 0, 0), 40))
     textboxes.append(u.Textbox(pg, 275, 330, 200, 50, '500', (0, 0, 0), 40))
+    if verbose:
+        print('[+] Finished initializing start screen')
 
 
 def update(pygame, display, deltatime, cs):
@@ -52,14 +63,20 @@ def update(pygame, display, deltatime, cs):
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
+                    if verbose:
+                        print('[o] Requesting data submition...')
                     if data_validation():
+                        if verbose:
+                            print('[+] Data is valid! Placing in temporary location...')
                         f = open('TEMPDATA', 'w')
                         for t in textboxes:
                             f.write(f'{t.text}\n')
                         f.close()
+                        if verbose:
+                            print('[o] Moving on to image rendering process')
                         return 1
                     else:
-                        print('Error with validation (user error)')
+                        print('[-] Error with validation (user error)')
 
 
     # render #
